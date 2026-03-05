@@ -1,0 +1,29 @@
+{
+  "name": "ai-todo-cli",
+  "version": "0.1.0",
+  "description": "CLI tool for AI agents to interact with ai-todo",
+  "type": "module",
+  "bin": {
+    "ai-todo": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch"
+  },
+  "dependencies": {
+    "commander": "^13.0.0",
+    "open": "^10.0.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.9.0",
+    "@types/node": "^22.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}
