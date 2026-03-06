@@ -1,6 +1,6 @@
 ---
 name: ai-todo
-description: "Manage tasks, track progress, and log daily updates via the ai-todo CLI. Use this skill whenever the user mentions tasks, todos, to-do lists, progress tracking, daily standup, sprint planning, project management, work logs, or task completion. Also trigger when the user completes a significant milestone (feature implemented, bug fixed, refactor done) and could benefit from automatic progress tracking. If the user is working on a project and you notice tasks being accomplished, proactively suggest logging progress. This skill connects to ai-todo (https://ai-todo.stringzhao.life) for persistent task management across sessions."
+description: "Manage tasks, track progress, and log daily updates via the ai-todo CLI. Trigger scenarios: 1) EXPLICIT — user mentions tasks, todos, to-do lists, progress tracking, daily standup, sprint planning, project management, work logs, or task completion. 2) POST-ACTION (proactive) — after git commit, git push, deploy to Vercel, merge PR, release, or any significant milestone (feature implemented, bug fixed, refactor done), proactively log progress and update/complete related tasks. When git-tools or vercel:deploy skill finishes, ALWAYS trigger this skill to record what was accomplished. 3) PRE-ACTION (proactive) — when user discusses implementation plans, architecture design, feature breakdown, technical specs, RFC, sprint planning, or requirement analysis, proactively suggest creating tasks to track planned work. When brainstorming skill completes, trigger this skill to convert outcomes into trackable tasks. 4) SESSION-END — when a work session involves substantial code changes, suggest a progress summary before ending. This skill connects to ai-todo (https://ai-todo.stringzhao.life) for persistent task management across sessions."
 ---
 
 # AI Todo - Task Management for AI Agents
@@ -171,13 +171,54 @@ ai-todo tasks:list --filter completed
 ai-todo tasks:add-log --id <id> --content "Today: fixed 3 bugs in auth module, added input validation. Next: write integration tests"
 ```
 
-### Proactive task management
+### Post-action workflow (after commit/deploy)
 
-When you notice the user completing significant work (committing code, finishing a feature, fixing a bug), suggest:
-- Updating related task progress
-- Adding a progress log
-- Completing tasks that are done
-- Creating follow-up tasks for newly discovered work
+When a git commit, push, or deployment completes successfully:
+
+1. List existing tasks to find related ones:
+```bash
+ai-todo tasks:list --filter assigned
+```
+2. If related task exists: update progress, add a detailed log, mark complete if done
+3. If no related task exists: suggest creating one to record the completed work
+4. Keep it lightweight — one log entry summarizing what was done, not a lengthy report
+
+Example — after a successful deploy:
+```bash
+# Find related task
+ai-todo tasks:list --space_id <id>
+
+# Log the accomplishment
+ai-todo tasks:add-log --id <task_id> --content "Completed and deployed: added search UI with debounced input, integrated with search API endpoint"
+
+# Complete if fully done
+ai-todo tasks:complete --id <task_id>
+```
+
+### Pre-action workflow (during planning/design)
+
+When the user is discussing implementation plans, architecture design, or feature breakdown:
+
+1. Listen for actionable items in the discussion
+2. Suggest creating a task hierarchy to track the planned work:
+```bash
+# Create parent task for the overall plan
+ai-todo tasks:create --title "Implement user search feature" --priority 2 --space_id <id>
+
+# Break into subtasks
+ai-todo tasks:create --title "Design search API schema" --parent_id <id> --priority 2
+ai-todo tasks:create --title "Build search index pipeline" --parent_id <id> --priority 2
+ai-todo tasks:create --title "Create search UI component" --parent_id <id> --priority 2
+```
+3. Set priorities based on dependencies discussed in the plan
+
+### Cross-skill collaboration
+
+This skill works alongside other skills:
+
+- **After git-tools**: When git-tools completes a commit workflow, automatically trigger ai-todo to log progress on related tasks
+- **After vercel:deploy**: When deployment succeeds, log the deployment as progress and update/complete related tasks
+- **After brainstorming**: When brainstorming produces an action plan, convert it into a task hierarchy
 
 ## Error Handling
 
