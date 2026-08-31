@@ -1,5 +1,7 @@
 # ai-todo-cli
 
+> **⚠️ 已迁移 / Moved**：本仓库已并入 [strzhao/ai-todo](https://github.com/strzhao/ai-todo) monorepo 的 [`apps/cli`](https://github.com/strzhao/ai-todo/tree/main/apps/cli)。后续开发、issue、发布均在主仓进行；npm 包 `ai-todo-cli` 照常发布（发布源已切换到主仓 `cli-v*` tag + OIDC trusted publishing）。本仓库已归档为只读。
+
 CLI tool for AI agents to interact with [ai-todo](https://ai-todo.stringzhao.life).
 
 All commands are dynamically discovered from the server. All output is JSON.
